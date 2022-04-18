@@ -37,19 +37,29 @@ if (!isSSR) {
         const { userName, password } = JSON.parse(params.body);
         if (!userName) {
           return {
-            status: 'error',
+            code: 0,
+            data: null,
             msg: '用户名不能为空',
           };
         }
         if (!password) {
           return {
-            status: 'error',
+            code: 0,
+            data: null,
             msg: '密码不能为空',
           };
         }
-        if (userName === 'admin' && password === 'admin') {
+        if (userName === 'admin' && password === 'adminadmin') {
           return {
-            status: 'ok',
+            code: 0,
+            data: {
+              code: 0,
+              data: {
+                token: 'admin',
+                userName: 'admin'
+              },
+              msg: '登录成功'
+            },
           };
         }
         return {

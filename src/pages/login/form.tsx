@@ -5,6 +5,7 @@ import {
   Link,
   Button,
   Space,
+  Message,
 } from '@arco-design/web-react';
 import { FormInstance } from '@arco-design/web-react/es/Form';
 import { IconLock, IconUser } from '@arco-design/web-react/icon';
@@ -25,6 +26,7 @@ export default function LoginForm() {
   const t = useLocale(locale);
 
   const [rememberPassword, setRememberPassword] = useState(!!loginParams);
+  const [form] = Form.useForm()
 
   function afterLoginSuccess(params) {
     // 记住密码
@@ -45,11 +47,12 @@ export default function LoginForm() {
     axios
       .post('/api/user/login', params)
       .then((res) => {
-        const { status, msg } = res.data;
-        if (status === 'ok') {
+        console.log(res)
+        const {data:{msg, code} } = res.data;
+        if(res.data && code === 0) {
           afterLoginSuccess(params);
         } else {
-          setErrorMessage(msg || t['login.form.login.errMsg']);
+          setErrorMessage(msg)
         }
       })
       .finally(() => {
@@ -57,10 +60,18 @@ export default function LoginForm() {
       });
   }
 
-  function onSubmitClick() {
-    formRef.current.validate().then((values) => {
-      login(values);
-    });
+  async function onSubmitClick() {
+    // formRef.current.validate().then((values) => {
+    //   login(values);
+    // });
+    try {
+      await form.validate()
+      const values = await form.getFields()
+      console.log(values);
+      login(values)
+    } catch (error) {
+      Message.error('校验失败')
+    }
   }
 
   // 读取 localStorage，设置初始值
@@ -84,11 +95,15 @@ export default function LoginForm() {
         className={styles['login-form']}
         layout="vertical"
         ref={formRef}
-        initialValues={{ userName: 'admin', password: 'admin' }}
+        form={form}
+        initialValues={{ userName: 'admin', password: 'adminadmin' }}
       >
         <Form.Item
           field="userName"
-          rules={[{ required: true, message: t['login.form.userName.errMsg'] }]}
+          rules={[{ required: true, message: '请输入账号' },{
+            match: /^[a-zA-Z0-9_-]{5,20}$/,
+            message: '账号5到20位'
+          }]}
         >
           <Input
             prefix={<IconUser />}
@@ -98,7 +113,10 @@ export default function LoginForm() {
         </Form.Item>
         <Form.Item
           field="password"
-          rules={[{ required: true, message: t['login.form.password.errMsg'] }]}
+          rules={[{ required: true, message: '请输入密码' },{
+            match: /^[a-zA-Z0-9_-]{6,20}$/,
+            message:'密码6-20位数字字母下划线组成'
+          }]}
         >
           <Input.Password
             prefix={<IconLock />}
