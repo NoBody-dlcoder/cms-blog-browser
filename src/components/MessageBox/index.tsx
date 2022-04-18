@@ -100,6 +100,7 @@ function DropContent() {
           }
         >
           {tabList.map((item) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { key, title, avatar } = item;
             const data = groupData[key] || [];
             const unReadData = data.filter((item) => !item.status);

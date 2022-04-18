@@ -61,6 +61,7 @@ function Overview() {
   const [loading, setLoading] = useState(true);
   const t = useLocale(locale);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userInfo = useSelector((state: any) => state.userInfo || {});
 
   const fetchData = () => {

@@ -9,6 +9,7 @@ function OverviewAreaLine({
   name = '总内容量',
   color = '#4080FF',
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
   loading: boolean;
   name?: string;

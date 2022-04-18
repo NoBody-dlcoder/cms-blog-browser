@@ -20,9 +20,9 @@ export const routes: Route[] = [
     ],
   },
   {
-    name: 'Example',
-    key: 'example',
-  },
+    name: 'menu.categories',
+    key: 'categories',
+  }
 ];
 
 export const getName = (path: string, routes) => {
@@ -83,6 +83,7 @@ const useRoute = (userPermission): [Route[], string] => {
   useEffect(() => {
     const newRoutes = filterRoute(routes);
     setPermissionRoute(newRoutes);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userPermission]);
 
   const defaultRoute = useMemo(() => {

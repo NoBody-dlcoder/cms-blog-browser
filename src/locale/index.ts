@@ -40,6 +40,7 @@ const i18n = {
   'zh-CN': {
     'menu.dashboard': '仪表盘',
     'menu.dashboard.workplace': '工作台',
+    'menu.categories': '分类管理',
     'menu.user.info': '用户信息',
     'menu.user.setting': '用户设置',
     'menu.user.switchRoles': '切换角色',
