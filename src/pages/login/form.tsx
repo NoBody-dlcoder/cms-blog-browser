@@ -10,64 +10,67 @@ import {
 import { FormInstance } from '@arco-design/web-react/es/Form';
 import { IconLock, IconUser } from '@arco-design/web-react/icon';
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import useStorage from '@/utils/useStorage';
 import useLocale from '@/utils/useLocale';
 import locale from './locale';
 import styles from './style/index.module.less';
+import {login as userLogin} from '../../api/login/login'
+import { useDispatch } from 'react-redux';
 
 export default function LoginForm() {
   const formRef = useRef<FormInstance>();
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginParams, setLoginParams, removeLoginParams] =
-    useStorage('loginParams');
-
+  const [loginParams, setLoginParams, removeLoginParams] = useStorage('loginParams');
   const t = useLocale(locale);
-
   const [rememberPassword, setRememberPassword] = useState(!!loginParams);
   const [form] = Form.useForm()
+  const dispatch = useDispatch()
 
   function afterLoginSuccess(params) {
     // 记住密码
     if (rememberPassword) {
       setLoginParams(JSON.stringify(params));
+      dispatch({
+        type: 'update-userInfo',
+        paload: params.userName
+      })
     } else {
       removeLoginParams();
     }
     // 记录登录状态
-    localStorage.setItem('userStatus', 'login');
+    localStorage.setItem('token', params.token);
     // 跳转首页
     window.location.href = '/';
   }
 
-  function login(params) {
+ async  function login(params) {
     setErrorMessage('');
     setLoading(true);
-    axios
-      .post('/api/user/login', params)
-      .then((res) => {
-        console.log(res)
-        const {data:{msg, code} } = res.data;
-        if(res.data && code === 0) {
-          afterLoginSuccess(params);
-        } else {
-          setErrorMessage(msg)
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+   try {
+    const res = await userLogin(params)
+    if(res.data && (res as any).code === 0) {
+      afterLoginSuccess(params);
+    } else {
+      setErrorMessage((res as any).msg)
+    }
+   } catch (error) {
+     
+   } finally {
+    setLoading(false);
+   }
   }
 
   async function onSubmitClick() {
+    // 第一种方法
     // formRef.current.validate().then((values) => {
     //   login(values);
     // });
+
+    // 第二种验证方法
     try {
       await form.validate()
       const values = await form.getFields()
-      console.log(values);
       login(values)
     } catch (error) {
       Message.error('校验失败')
